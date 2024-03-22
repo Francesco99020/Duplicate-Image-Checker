@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -14,9 +15,9 @@ public class ImageInputApp extends Application {
     private Label selectedFileLabel;
     private Label selectedDirectoryLabel;
     private Label searchStatusLabel;
+    private CheckBox searchSubdirectoriesCheckBox; // New CheckBox
 
-
-    private boolean searchForImage(String selectedPhotoPath, String selectedDirectoryPath) {
+    private boolean searchForImage(String selectedPhotoPath, String selectedDirectoryPath, boolean searchSubdirectories) {
         File directory = new File(selectedDirectoryPath);
         File[] files = directory.listFiles();
         if (files != null) {
@@ -26,6 +27,12 @@ public class ImageInputApp extends Application {
                     ImageComparison imageComparison = new ImageComparison(selectedPhotoPath, file.getAbsolutePath());
                     if (imageComparison.compareImages()) {
                         return true; // Image found
+                    }
+                } else if (searchSubdirectories && file.isDirectory()) {
+                    // If searchSubdirectories is enabled and the current file is a directory, recursively search it
+                    boolean imageFoundInSubdirectory = searchForImage(selectedPhotoPath, file.getAbsolutePath(), true);
+                    if (imageFoundInSubdirectory) {
+                        return true; // Image found in subdirectory
                     }
                 }
             }
@@ -40,6 +47,7 @@ public class ImageInputApp extends Application {
         selectedFileLabel = new Label();
         selectedDirectoryLabel = new Label();
         searchStatusLabel = new Label();
+        searchSubdirectoriesCheckBox = new CheckBox("Search Subdirectories"); // Create CheckBox
 
         Button selectFileButton = new Button("Select JPG File");
         selectFileButton.setOnAction(e -> {
@@ -76,11 +84,12 @@ public class ImageInputApp extends Application {
                 String filePath = selectedFileLabel.getText().substring(startIndex);
                 startIndex = selectedDirectoryLabel.getText().indexOf(":") + 2; // Start index after the ": "
                 String directoryPath = selectedDirectoryLabel.getText().substring(startIndex);
-                boolean imageFound = searchForImage(filePath, directoryPath);
+                boolean searchSubdirectories = searchSubdirectoriesCheckBox.isSelected(); // Get checkbox state
+                boolean imageFound = searchForImage(filePath, directoryPath, searchSubdirectories);
                 if (imageFound) {
-                    searchStatusLabel.setText("Image found in directory.");
+                    searchStatusLabel.setText("Image found.");
                 } else {
-                    searchStatusLabel.setText("Image not found in directory.");
+                    searchStatusLabel.setText("Image not found.");
                 }
                 // Clear selected file and directory labels
                 selectedFileLabel.setText("");
@@ -89,7 +98,7 @@ public class ImageInputApp extends Application {
         });
 
         VBox root = new VBox(10);
-        root.getChildren().addAll(selectFileButton, selectedFileLabel, selectDirectoryButton, selectedDirectoryLabel, searchStatusLabel, startSearchButton);
+        root.getChildren().addAll(selectFileButton, selectedFileLabel, selectDirectoryButton, selectedDirectoryLabel, searchSubdirectoriesCheckBox, searchStatusLabel, startSearchButton);
         Scene scene = new Scene(root, 400, 250);
         primaryStage.setScene(scene);
         primaryStage.show();
