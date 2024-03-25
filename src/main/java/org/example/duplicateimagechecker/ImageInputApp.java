@@ -27,7 +27,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ImageInputApp extends Application {
-
     private String duplicateDirectoryPath = "./duplicate";
     private String newDirectoryPath = "./new";
     private Label selectedFileLabel;
@@ -130,13 +129,6 @@ public class ImageInputApp extends Application {
             }
             // Shutdown ExecutorService after submitting all tasks
             executor.shutdown();
-
-//            try {
-//                // Wait for all tasks to complete
-//                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
         }
     }
 
@@ -276,7 +268,6 @@ public class ImageInputApp extends Application {
         }
     }
 
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Duplicate Image Checker App");
@@ -406,7 +397,7 @@ public class ImageInputApp extends Application {
         boolean searchSubdirectories = searchSubdirectoriesCheckBox.isSelected(); // Get checkbox state
 
         // Perform directory search in a separate thread to keep UI responsive
-        Thread directorySearchThread = new Thread(() -> {
+        return new Thread(() -> {
             searchInDirectory(inputDirPath, directoryPath, searchSubdirectories);
             // After the search is complete, update the UI
             Platform.runLater(() -> {
@@ -414,7 +405,6 @@ public class ImageInputApp extends Application {
                 displayDirectories();
             });
         });
-        return directorySearchThread;
     }
 
     private Button getSelectDirectoryButton(String s, Stage primaryStage, Label selectedDirectoryLabel) {
@@ -453,7 +443,6 @@ public class ImageInputApp extends Application {
         });
         return setOutputDirectoriesButton;
     }
-
     public static void main(String[] args) {
         launch(args);
     }

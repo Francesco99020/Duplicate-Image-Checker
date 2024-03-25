@@ -5,7 +5,6 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class ImageComparison {
-
     private final BufferedImage image1;
     private final BufferedImage image2;
 
